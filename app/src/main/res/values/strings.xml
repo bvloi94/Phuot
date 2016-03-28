@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Phượt</string>
+    <string name="registerInstruction">Đăng ký tài khoản để có thể truy cập dữ liệu trên tất cả các thiết bị của bạn.</string>
+    <string name="btnRegister">ĐĂNG KÝ</string>
+    <string name="btnLogin">ĐĂNG NHẬP</string>
+</resources>
