@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name">Phượt</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_home">HomeActivity</string>
+    <string name="title_activity_home">HÀNH TRÌNH</string>
+    <string name="title_add_new_trip">Hành trình mới</string>
+    <string name="title_trip_info">Chi tiết hành trình</string>
+    <string name="search_place_title">Thêm địa điểm</string>
+    <string name="search_member_title">Thêm thành viên</string>
 </resources>

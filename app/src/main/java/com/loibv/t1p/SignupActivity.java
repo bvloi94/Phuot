@@ -2,10 +2,7 @@ package com.loibv.t1p;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,19 +10,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
+import com.loibv.t1p.iinterface.OnSendObject;
 import com.loibv.t1p.model.Account;
 import com.loibv.t1p.utils.Const;
-
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
+import com.loibv.t1p.utils.ServiceUtil;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -40,12 +28,18 @@ public class SignupActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
-    @Bind(R.id.input_name) EditText _nameText;
-    @Bind(R.id.input_email) EditText _emailText;
-    @Bind(R.id.input_password) EditText _passwordText;
-    @Bind(R.id.input_confirm_password) EditText _confirmPasswordText;
-    @Bind(R.id.btn_signup) Button _signupButton;
-    @Bind(R.id.link_login) TextView _loginLink;
+    @Bind(R.id.input_name)
+    EditText _nameText;
+    @Bind(R.id.input_email)
+    EditText _emailText;
+    @Bind(R.id.input_password)
+    EditText _passwordText;
+    @Bind(R.id.input_confirm_password)
+    EditText _confirmPasswordText;
+    @Bind(R.id.btn_signup)
+    Button _signupButton;
+    @Bind(R.id.link_login)
+    TextView _loginLink;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,7 +64,14 @@ public class SignupActivity extends AppCompatActivity {
     }
 
     public void signup() {
+
         Log.d(TAG, "Signup");
+
+        progressDialog = new ProgressDialog(SignupActivity.this,
+                R.style.AppTheme_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Creating Account...");
+        progressDialog.show();
 
         if (!validate()) {
             onSignupFailed();
@@ -79,68 +80,38 @@ public class SignupActivity extends AppCompatActivity {
 
         _signupButton.setEnabled(false);
 
-        progressDialog = new ProgressDialog(SignupActivity.this,
-                R.style.AppTheme_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Creating Account...");
-        progressDialog.show();
-
-        String name = _nameText.getText().toString();
-        String email = _emailText.getText().toString();
-        String password = _passwordText.getText().toString();
-
-        HashMap<String, String> postObj = new HashMap<String, String>();
-        postObj.put(KEY_NAME, name);
-        postObj.put(KEY_EMAIL, email);
-        postObj.put(KEY_PASSWORD, password);
+        final String name = _nameText.getText().toString();
+        final String email = _emailText.getText().toString();
+        final String password = _passwordText.getText().toString();
 
         showProgressDialog();
-        JsonObjectRequest jsonObjRequest = new JsonObjectRequest(Request.Method.POST,
-                Const.URL_LOGIN, new JSONObject(postObj),
-                new Response.Listener<JSONObject>() {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d(TAG, response.toString());
-                        Toast.makeText(SignupActivity.this, response.toString(), Toast.LENGTH_LONG).show();
-                        // TODO
-                        hideProgressDialog();
-
-                    }
-                }, new Response.ErrorListener() {
-
+        ServiceUtil<Account> serviceUtil = new ServiceUtil<>(this);
+        serviceUtil.getHashMap().put("fullname",name);
+        serviceUtil.getHashMap().put("email",email);
+        serviceUtil.getHashMap().put("password",email);
+        serviceUtil.sendObjectData(Const.URL_SIGNUP, new OnSendObject() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error:" + error.getMessage());
-                hideProgressDialog();
+            public void onTaskCompleted(boolean error, String message) {
+                if (error) {
+                    onSignupSuccess();
+                } else {
+                    onSignupFailed();
+                }
             }
-        }){
-            /* Passing some request headers*/
-            @Override
-            public Map<String, String> getHeaders()throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json");
-                return headers;
-            }
-        } ;
-
-        // Adding request to request queue
-        ApplicationController.getInstance().addToRequestQueue(jsonObjRequest, Const.TAG_JSONOBJ_REQUEST);
-
-        //Canceling request
-//		ApplicationController.getInstance().getRequestQueue().cancelAll(TAG_JSONOBJ_REQUEST);
-
+        });
     }
 
 
     public void onSignupSuccess() {
+        hideProgressDialog();
+        Toast.makeText(this, "Signup success! You can login now.", Toast.LENGTH_SHORT).show();
         _signupButton.setEnabled(true);
-        setResult(RESULT_OK, null);
         finish();
     }
 
     public void onSignupFailed() {
-        Toast.makeText(getBaseContext(), "Signup failed", Toast.LENGTH_SHORT).show();
+        hideProgressDialog();
         _signupButton.setEnabled(true);
     }
 
@@ -175,6 +146,7 @@ public class SignupActivity extends AppCompatActivity {
 
         if (confirmPassword.isEmpty() || !confirmPassword.equals(password)) {
             _confirmPasswordText.setError("password not match");
+            valid = false;
         } else {
             _confirmPasswordText.setError(null);
         }
@@ -182,13 +154,13 @@ public class SignupActivity extends AppCompatActivity {
         return valid;
     }
 
-    private void showProgressDialog(){
+    private void showProgressDialog() {
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
     }
 
-    private void hideProgressDialog(){
+    private void hideProgressDialog() {
         if (progressDialog.isShowing()) {
             progressDialog.dismiss();
         }

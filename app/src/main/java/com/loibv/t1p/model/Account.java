@@ -2,14 +2,21 @@ package com.loibv.t1p.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import com.loibv.t1p.dao.ISqliteTable;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.loibv.t1p.dao.ISqliteData;
 import com.loibv.t1p.dbHelper.DatabaseHelper;
+import com.loibv.t1p.utils.JsonGeneratorUtil;
+
+import java.io.Serializable;
 
 /**
  * Created by vanloibui on 4/5/16.
  */
-public class Account implements ISqliteTable {
+public class Account implements ISqliteData, Serializable, Parcelable {
     private int id;
     private String email;
     private String password;
@@ -18,6 +25,9 @@ public class Account implements ISqliteTable {
     private String fullname;
     private int roleId;
     private int isActive;
+
+    public Account() {
+    }
 
     public int getId() {
         return this.id;
@@ -75,10 +85,12 @@ public class Account implements ISqliteTable {
         this.roleId = roleId;
     }
 
+    @JsonSerialize(using = JsonGeneratorUtil.NumericBooleanSerializer.class)
     public int getIsActive() {
         return this.isActive;
     }
 
+    @JsonDeserialize(using = JsonGeneratorUtil.NumericBooleanDeserializer.class)
     public void setIsActive(int isActive) {
         this.isActive = isActive;
     }
@@ -112,4 +124,75 @@ public class Account implements ISqliteTable {
     public String getPrimaryValue() {
         return String.valueOf(this.id);
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(id);
+        dest.writeString(email);
+        dest.writeString(password);
+        dest.writeString(phone);
+        dest.writeString(avatar);
+        dest.writeString(fullname);
+        dest.writeInt(roleId);
+        dest.writeInt(isActive);
+    }
+
+    protected Account(Parcel in) {
+        id = in.readInt();
+        email = in.readString();
+        password = in.readString();
+        phone = in.readString();
+        avatar = in.readString();
+        fullname = in.readString();
+        roleId = in.readInt();
+        isActive = in.readInt();
+    }
+
+    public static final Creator<Account> CREATOR = new Creator<Account>() {
+        @Override
+        public Account createFromParcel(Parcel in) {
+            return new Account(in);
+        }
+
+        @Override
+        public Account[] newArray(int size) {
+            return new Account[size];
+        }
+    };
+
+//    @Override
+//    public JSONObject toJson() throws JSONException {
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("id", this.id);
+//        jsonObject.put("email", this.email);
+//        jsonObject.put("password", this.password);
+//        jsonObject.put("phone", this.phone);
+//        jsonObject.put("avatar", this.avatar);
+//        jsonObject.put("fullname", this.fullname);
+//        jsonObject.put("roleId", this.roleId);
+//        jsonObject.put("isActive", this.isActive == 1);
+//        return jsonObject;
+//    }
+//
+//    @Override
+//    public Account fromJson(JSONObject jsonObject) throws JSONException, ParseException {
+//        this.id = jsonObject.getInt("id");
+//        this.email = jsonObject.getString("email");
+//        this.password = jsonObject.getString("password");
+//        this.phone = jsonObject.getString("phone");
+//        this.avatar = jsonObject.getString("avatar");
+//        this.fullname = jsonObject.getString("fullname");
+//        this.roleId = jsonObject.getInt("roleId");
+//        if (jsonObject.getBoolean("isActive")) {
+//            this.isActive = 1;
+//        } else {
+//            this.isActive = 0;
+//        }
+//        return this;
+//    }
 }

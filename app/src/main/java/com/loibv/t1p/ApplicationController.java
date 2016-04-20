@@ -1,13 +1,13 @@
 package com.loibv.t1p;
 
+import android.app.Application;
+import android.text.TextUtils;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.Volley;
 import com.loibv.t1p.utils.LruBitmapCache;
-
-import android.app.Application;
-import android.text.TextUtils;
 
 /**
  * @author LoiBV

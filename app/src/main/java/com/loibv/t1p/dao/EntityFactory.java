@@ -16,46 +16,47 @@ import com.loibv.t1p.model.TripPreparation;
 /**
  * Created by vanloibui on 4/4/16.
  */
-public class SqliteTableFactory {
-    private SqliteTableFactory() {
+public class EntityFactory {
+
+    private EntityFactory() {
 
     }
 
-    private static SqliteTableFactory instance;
+    private static EntityFactory instance;
 
-    public static SqliteTableFactory getInstance() {
+    public static EntityFactory getInstance() {
         if (instance == null) {
-            instance = new SqliteTableFactory();
+            instance = new EntityFactory();
         }
         return instance;
     }
 
-    public <TEntity extends ISqliteTable> TEntity getSqliteTableObject(Class<TEntity> c) {
+    public <T> T getObject(Class<T> c) {
 
         if (c == Account.class) {
-            return (TEntity) new Account();
+            return (T) new Account();
         } else if (c == City.class) {
-            return (TEntity) new City();
+            return (T) new City();
         } else if (c == District.class) {
-            return (TEntity) new District();
+            return (T) new District();
         } else if (c == Fund.class) {
-            return (TEntity) new Fund();
+            return (T) new Fund();
         } else if (c == FundTransaction.class) {
-            return (TEntity) new FundTransaction();
+            return (T) new FundTransaction();
         } else if (c == Notification.class) {
-            return (TEntity) new Notification();
+            return (T) new Notification();
         } else if (c == Place.class) {
-            return (TEntity) new Place();
+            return (T) new Place();
         } else if (c == Preparation.class) {
-            return (TEntity) new Preparation();
+            return (T) new Preparation();
         } else if (c == Transaction.class) {
-            return (TEntity) new Transaction();
+            return (T) new Transaction();
         } else if (c == Trip.class) {
-            return (TEntity) new Trip();
+            return (T) new Trip();
         } else if (c == TripPlace.class) {
-            return (TEntity) new TripPlace();
+            return (T) new TripPlace();
         } else if (c == TripPreparation.class) {
-            return (TEntity) new TripPreparation();
+            return (T) new TripPreparation();
         }
         return null;
     }

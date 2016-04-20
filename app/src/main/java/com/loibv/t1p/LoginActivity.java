@@ -1,9 +1,7 @@
 package com.loibv.t1p;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -13,38 +11,31 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.VolleyLog;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.loibv.t1p.iinterface.OnRequestObject;
+import com.loibv.t1p.model.Account;
 import com.loibv.t1p.utils.Const;
+import com.loibv.t1p.utils.InternalStorage;
+import com.loibv.t1p.utils.ServiceUtil;
 
-import org.json.JSONObject;
+import java.io.IOException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import butterknife.ButterKnife;
 import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final String TAG = "LoginActivity";
     private static final int REQUEST_SIGNUP = 0;
-    private static final String KEY_EMAIL = "email";
-    private static final String KEY_PASSWORD = "password";
 
     private ProgressDialog progressDialog;
 
-    @Bind(R.id.input_email) EditText _emailText;
-    @Bind(R.id.input_password) EditText _passwordText;
-    @Bind(R.id.btn_login) Button _loginButton;
-    @Bind(R.id.link_signup) TextView _signupLink;
+    @Bind(R.id.input_email)
+    EditText _emailText;
+    @Bind(R.id.input_password)
+    EditText _passwordText;
+    @Bind(R.id.btn_login)
+    Button _loginButton;
+    @Bind(R.id.link_signup)
+    TextView _signupLink;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,11 +43,41 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
 
+        progressDialog = new ProgressDialog(LoginActivity.this,
+                R.style.AppTheme_Dialog);
+        progressDialog.setIndeterminate(true);
+        progressDialog.setMessage("Authenticating...");
+        progressDialog.setCancelable(false);
+
+        Account acc = null;
+
+        try {
+            acc = (Account) InternalStorage.readObject(this, Const.IS_ACCOUNT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        if (acc != null) {
+            _emailText.setText(acc.getEmail());
+        }
+
         _loginButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-                login();
+                if (!validate()) {
+                    onLoginFailed();
+                    return;
+                }
+
+                _loginButton.setEnabled(false);
+
+                final String email = _emailText.getText().toString().trim();
+                final String password = _passwordText.getText().toString().trim();
+
+                loginRequest(email, password);
             }
         });
 
@@ -71,84 +92,29 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void login() {
-        Log.d(TAG, "Login");
-
-        if (!validate()) {
-            onLoginFailed();
-            return;
-        }
-
-        _loginButton.setEnabled(false);
-
-        progressDialog = new ProgressDialog(LoginActivity.this,
-                R.style.AppTheme_Dialog);
-        progressDialog.setIndeterminate(true);
-        progressDialog.setMessage("Authenticating...");
-        progressDialog.setCancelable(false);
-
-        final String email = _emailText.getText().toString().trim();
-        final String password = _passwordText.getText().toString().trim();
-
-        HashMap<String, String> postObj = new HashMap<String, String>();
-        postObj.put(KEY_EMAIL, email);
-        postObj.put(KEY_PASSWORD, password);
-
-//        SharedPreferences sharedPreferences = getSharedPreferences(Const.ACCPREFS, Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString(Const.SP_EMAIL, "A@B.C");
-//        editor.putString(Const.SP_PASSWORD, "PWD");
-//        editor.commit();
-
-        onLoginSuccess();
-
-//        showProgressDialog();
-//        JsonObjectRequest jsonObjRequest = new JsonObjectRequest(Request.Method.POST,
-//                Const.URL_LOGIN, new JSONObject(postObj),
-//                new Response.Listener<JSONObject>() {
-//
-//                    @Override
-//                    public void onResponse(JSONObject response) {
-//                        Log.d(TAG, response.toString());
-//                        Toast.makeText(LoginActivity.this, response.toString(), Toast.LENGTH_LONG).show();
-//                        // TODO
-//                        hideProgressDialog();
-//
-//                    }
-//                }, new Response.ErrorListener() {
-//
-//            @Override
-//            public void onErrorResponse(VolleyError error) {
-//                VolleyLog.d(TAG, "Error:" + error.getMessage());
-//                hideProgressDialog();
-//            }
-//        }) {
-//            /* Passing some request headers*/
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<String, String>();
-//                headers.put("Content-Type", "application/json");
-//                return headers;
-//            }
-//        };
-//
-//        // Adding request to request queue
-//        ApplicationController.getInstance().addToRequestQueue(jsonObjRequest, Const.TAG_JSONOBJ_REQUEST);
-//
-//        //Canceling request
-////		ApplicationController.getInstance().getRequestQueue().cancelAll(TAG_JSONOBJ_REQUEST);
-
+    public void loginRequest(String email, String password) {
+        showProgressDialog();
+        ServiceUtil<Account> serviceUtil = new ServiceUtil<>(this);
+        serviceUtil.getHashMap().put("email", email);
+        serviceUtil.getHashMap().put("password", password);
+        serviceUtil.retrieveObjectData(Const.URL_LOGIN, new OnRequestObject<Account>() {
+            @Override
+            public void onTaskCompleted(Account obj, boolean error, String message) {
+                if (!error) {
+                    onLoginSuccess(obj);
+                } else {
+                    onLoginFailed();
+                }
+            }
+        }, Account.class);
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
+                Account acc = data.getParcelableExtra(Const.BD_ACCOUNT);
+                loginRequest(acc.getEmail(), acc.getPassword());
             }
         }
     }
@@ -159,12 +125,21 @@ public class LoginActivity extends AppCompatActivity {
         moveTaskToBack(true);
     }
 
-    public void onLoginSuccess() {
+    public void onLoginSuccess(Account acc) {
         _loginButton.setEnabled(true);
-        finish();
+        Intent homeIntent = new Intent(this, HomeActivity.class);
+        try {
+            // Save the list of entries to internal storage
+            InternalStorage.writeObject(this, Const.IS_ACCOUNT, acc);
+        } catch (IOException e) {
+            Log.e(Const.IS_TAG, e.getMessage());
+        }
+        hideProgressDialog();
+        startActivity(homeIntent);
     }
 
     public void onLoginFailed() {
+        hideProgressDialog();
         Toast.makeText(getBaseContext(), "Login failed", Toast.LENGTH_LONG).show();
         _loginButton.setEnabled(true);
     }

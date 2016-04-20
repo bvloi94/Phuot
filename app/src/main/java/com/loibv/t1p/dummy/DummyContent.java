@@ -1,6 +1,11 @@
 package com.loibv.t1p.dummy;
 
+import com.loibv.t1p.R;
+import com.loibv.t1p.adapter.Trip;
+import com.loibv.t1p.model.Place;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +18,9 @@ import java.util.Map;
  */
 public class DummyContent {
 
+    public static  final List<Trip> TRIPS = new ArrayList<Trip>();
+
+    public static  final List<Place> PLACES = new ArrayList<Place>();
     /**
      * An array of sample (dummy) items.
      */
@@ -30,6 +38,51 @@ public class DummyContent {
         for (int i = 1; i <= COUNT; i++) {
             addItem(createDummyItem(i));
         }
+
+        Trip tripItem = new Trip();
+        tripItem.setName("Vinh Ha Long");
+        tripItem.setThumbnail(R.drawable.vinh_ha_long);
+        tripItem.setTime(new Date());
+        tripItem.setPlace("Place 1");
+        TRIPS.add(tripItem);
+
+        tripItem = new Trip();
+        tripItem.setName("Pho co Hoi An");
+        tripItem.setThumbnail(R.drawable.pho_co_hoi_an);
+        tripItem.setTime(new Date());
+        tripItem.setPlace("Place 2");
+        TRIPS.add(tripItem);
+
+        tripItem = new Trip();
+        tripItem.setName("Chua Thien Mu");
+        tripItem.setThumbnail(R.drawable.chua_thien_mu);
+        tripItem.setTime(new Date());
+        tripItem.setPlace("Place 3");
+        TRIPS.add(tripItem);
+
+        tripItem = new Trip();
+        tripItem.setName("Sa Pa");
+        tripItem.setThumbnail(R.drawable.sa_pa);
+        tripItem.setTime(new Date());
+        tripItem.setPlace("Place 4");
+        TRIPS.add(tripItem);
+
+        tripItem = new Trip();
+        tripItem.setName("Phu Quoc");
+        tripItem.setThumbnail(R.drawable.phu_quoc);
+        tripItem.setTime(new Date());
+        tripItem.setPlace("Place 5");
+        TRIPS.add(tripItem);
+
+        Place place = new Place();
+        place.setName("aaa");
+        PLACES.add(place);
+
+        place = new Place();
+        place.setName("bbb");
+        PLACES.add(place);
+
+
     }
 
     private static void addItem(DummyItem item) {

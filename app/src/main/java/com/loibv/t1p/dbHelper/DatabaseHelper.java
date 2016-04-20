@@ -1,22 +1,8 @@
 package com.loibv.t1p.dbHelper;
 
-import android.util.Log;
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import com.loibv.t1p.model.City;
-import com.loibv.t1p.model.District;
-import com.loibv.t1p.model.Place;
-import com.loibv.t1p.model.Preparation;
-import com.loibv.t1p.model.Trip;
-import com.loibv.t1p.model.TripPlace;
-import com.loibv.t1p.model.TripPreparation;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -49,20 +35,24 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String KEY_LOCATION = "Location";
 
     // Table Trip columns
+    public static final String KEY_CREATETIME = "CreateTime";
     public static final String KEY_STARTTIME = "StartTime";
     public static final String KEY_ENDTIME = "EndTime";
     public static final String KEY_GATHERINGPLACE = "GatheringPlace";
-    public static final String KEY_ISFINISHED = "IsFinished";
-    public static final String KEY_ADMINID = "AdminId";
+    public static final String KEY_STATUS = "Status";
+    public static final String KEY_LEADERID = "LeaderId";
     public static final String KEY_CITYID = "CityId";
     public static final String KEY_PREPARATIONID = "PreparationId";
     // Table TripPlace columns
     public static final String KEY_TRIPID = "TripId";
     public static final String KEY_PLACEID = "PlaceId";
+    public static final String KEY_NEXTTRIPID = "NextTripId";
+    public static final String KEY_VEHICLE = "Vehicle";
     // Table Place columns
     public static final String KEY_ADDRESS = "Address";
-    public static final String KEY_DISTRICTID = "DistrictId";
-    public static final String KEY_IMAGE = "Image";
+    public static final String KEY_IMAGE_PATH = "ImagePath";
+    public static final String KEY_LATITUDE = "Latitude";
+    public static final String KEY_LONGITUDE = "Longitude";
     // Table Preparation columns
     public static final String KEY_MEMBERID = "MemberId";
     public static final String KEY_OBJECT = "Object";
@@ -97,8 +87,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + KEY_STARTTIME + " TEXT, "
                     + KEY_ENDTIME + " TEXT, "
                     + KEY_GATHERINGPLACE + " TEXT, "
-                    + KEY_ISFINISHED + " INT, "
-                    + KEY_ADMINID + " INTEGER"
+                    + KEY_STATUS + " INT, "
+                    + KEY_LEADERID + " INTEGER"
                     + ")";
 
     // TripPlace table create statement
@@ -115,8 +105,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                     + KEY_NAME + " TEXT, "
                     + KEY_ADDRESS + " TEXT, "
-                    + KEY_DISTRICTID + " INTEGER, "
-                    + KEY_DESCRIPTION + " TEXT"
+                    + KEY_IMAGE_PATH + " INTEGER, "
+                    + KEY_DESCRIPTION + " TEXT, "
+                    + KEY_LATITUDE + " REAL, "
+                    + KEY_LONGITUDE + " REAL"
                     + ")";
 
     // District table create statement
@@ -200,6 +192,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     + KEY_FUNDID + " INTEGER, "
                     + KEY_TRANSACTIONID + " INTEGER"
                     + ")";
+
 
 
     public DatabaseHelper(Context context) {

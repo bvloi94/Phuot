@@ -3,13 +3,13 @@ package com.loibv.t1p.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.loibv.t1p.dao.ISqliteTable;
+import com.loibv.t1p.dao.ISqliteData;
 import com.loibv.t1p.dbHelper.DatabaseHelper;
 
 /**
  * Created by vanloibui on 4/5/16.
  */
-public class Notification implements ISqliteTable {
+public class Notification implements ISqliteData {
     private int id;
     private int receiverId;
     private int senderId;

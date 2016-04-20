@@ -3,10 +3,10 @@ package com.loibv.t1p.model;
 import android.content.ContentValues;
 import android.database.Cursor;
 
-import com.loibv.t1p.dao.ISqliteTable;
+import com.loibv.t1p.dao.ISqliteData;
 import com.loibv.t1p.dbHelper.DatabaseHelper;
 
-public class Preparation implements ISqliteTable {
+public class Preparation implements ISqliteData {
     private int id;
     private int memberId;
     private String object;
